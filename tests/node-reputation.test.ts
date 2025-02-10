@@ -1,21 +1,57 @@
+import { describe, it, expect, beforeEach } from "vitest"
 
-import { describe, expect, it } from "vitest";
+// Mock storage for node reputations
+const nodeReputations = new Map()
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+// Mock functions to simulate contract behavior
+function registerNode(node: string) {
+  nodeReputations.set(node, { reputation: 0 })
+  return true
+}
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
+function updateReputation(node: string, newReputation: number) {
+  if (!nodeReputations.has(node)) {
+    throw new Error("Node not found")
+  }
+  nodeReputations.set(node, { reputation: newReputation })
+  return true
+}
 
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
+function getNodeReputation(node: string) {
+  return nodeReputations.get(node)
+}
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
+describe("Node Reputation Contract", () => {
+  beforeEach(() => {
+    nodeReputations.clear()
+  })
+  
+  it("should register a node", () => {
+    const result = registerNode("node1")
+    expect(result).toBe(true)
+    const reputation = getNodeReputation("node1")
+    expect(reputation).toBeDefined()
+    expect(reputation.reputation).toBe(0)
+  })
+  
+  it("should update node reputation", () => {
+    registerNode("node1")
+    const result = updateReputation("node1", 50)
+    expect(result).toBe(true)
+    const reputation = getNodeReputation("node1")
+    expect(reputation.reputation).toBe(50)
+  })
+  
+  it("should not update reputation for unregistered node", () => {
+    expect(() => updateReputation("unregistered_node", 50)).toThrow("Node not found")
+  })
+  
+  it("should get node reputation", () => {
+    registerNode("node1")
+    updateReputation("node1", 75)
+    const reputation = getNodeReputation("node1")
+    expect(reputation).toBeDefined()
+    expect(reputation.reputation).toBe(75)
+  })
+})
+

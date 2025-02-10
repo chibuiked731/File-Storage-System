@@ -11,3 +11,5 @@ E
 tests/storage.test.ts,0/0/008b239f586fb5d7517258bc23f7500b2062da03
 N
 contracts/node-reputation.clar,e/6/e6498158a7ed0352fc6378d9af5094b47c9c52e2
+M
+tests/node-reputation.test.ts,d/4/d41653d07a37b1f9fa0b3708da3314f6fc41306f
