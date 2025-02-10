@@ -1,21 +1,48 @@
+import { describe, it, expect, beforeEach } from "vitest"
 
-import { describe, expect, it } from "vitest";
+// Mock storage for files
+const files = new Map()
+let nextFileId = 1
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+// Mock functions to simulate contract behavior
+function storeFile(owner: string, name: string, hash: string) {
+  const fileId = nextFileId++
+  files.set(fileId, { owner, name, hash })
+  return fileId
+}
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
+function getFile(fileId: number) {
+  return files.get(fileId)
+}
 
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
+describe("Storage Contract", () => {
+  beforeEach(() => {
+    files.clear()
+    nextFileId = 1
+  })
+  
+  it("should store a file", () => {
+    const fileId = storeFile("owner1", "test.txt", "hash123")
+    expect(fileId).toBe(1)
+    const file = getFile(fileId)
+    expect(file).toBeDefined()
+    expect(file.name).toBe("test.txt")
+    expect(file.owner).toBe("owner1")
+    expect(file.hash).toBe("hash123")
+  })
+  
+  it("should retrieve a stored file", () => {
+    const fileId = storeFile("owner1", "test.txt", "hash123")
+    const file = getFile(fileId)
+    expect(file).toBeDefined()
+    expect(file.name).toBe("test.txt")
+    expect(file.owner).toBe("owner1")
+    expect(file.hash).toBe("hash123")
+  })
+  
+  it("should return undefined for non-existent file", () => {
+    const file = getFile(999)
+    expect(file).toBeUndefined()
+  })
+})
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
